@@ -627,6 +627,19 @@ tif, png, jpg, bmp
 
 注意：当前 GUI 保存的是二值掩码文件，不保存原图叠加可视化图。出血点叠加可视化图由 `Bleeding_Spot_detection/predict.py` 生成。
 
+## 软件跨平台打包方法
+安装依赖：pip install pyinstaller
+
+### macOS 打包就在Mac上执行，Windows 打包就在Windows上执行（确保模型名正确）
+
+```bash
+pyinstaller --windowed \
+--name "Processing_Software" \
+--add-data "att_fusion_best.pth:." \
+--add-data "best.pt:." \
+inference_gui.py
+```
+
 ## 权重文件对应关系
 
 | 权重文件 | 使用位置 | 生成方式 |
