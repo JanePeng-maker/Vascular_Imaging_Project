@@ -33,17 +33,19 @@ class OCTA500Dataset(Dataset):
         img_path = self.img_paths[idx]
         mask_path = self.mask_paths[idx]
         filename = os.path.basename(img_path)
-
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         img = cv2.resize(img, self.img_size)
         img = img.astype(np.float32) / 255.0
 
-        mask = cv2.imread(mask_path)
-        mask = cv2.resize(mask, self.img_size, interpolation=cv2.INTER_NEAREST)
-        mask_gray = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-        mask_binary = (mask_gray > 127).astype(np.float32)
+        # 修复：读取三通道mask，红色动脉+绿色静脉全部合并为血管
+        mask_rgb = cv2.imread(mask_path)
+        # BGR通道分离：B蓝 G绿 R红
+        b, g, r = cv2.split(mask_rgb)
+        # 动脉(r>50) + 静脉(g>50) 全部作为血管前景
+        vessel_total = np.logical_or(r > 50, g > 50).astype(np.float32)
+        mask = cv2.resize(vessel_total, self.img_size, interpolation=cv2.INTER_NEAREST)
+        mask_binary = mask
 
         img_tensor = self.img_transform(img)
         mask_tensor = torch.from_numpy(mask_binary).unsqueeze(0).float()
-
         return img_tensor, mask_tensor, filename
