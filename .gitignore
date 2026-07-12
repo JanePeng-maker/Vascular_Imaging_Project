@@ -6,3 +6,8 @@ __pycache__/
 *.pyc
 ~.docx
 ~.xlsx
+
+
+Software/build/
+Software/dist/
+Software/\*.spec
